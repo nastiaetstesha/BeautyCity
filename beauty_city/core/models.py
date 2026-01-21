@@ -233,6 +233,7 @@ class Booking(models.Model):
 
     customer_name = models.CharField("Имя клиента", max_length=120, blank=True)
     phone = models.CharField("Телефон", max_length=20, validators=[phone_validator])
+    question = models.CharField("Вопрос", max_length=300, null=True, blank=True)
 
     start_at = models.DateTimeField("Начало")
     end_at = models.DateTimeField("Конец")
