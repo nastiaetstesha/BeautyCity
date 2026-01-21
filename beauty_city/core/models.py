@@ -78,6 +78,12 @@ class Specialist(models.Model):
         null=True,
         validators=[FileExtensionValidator(["svg", "png", "jpg", "jpeg", "webp"])],
     )
+    procedures = models.ManyToManyField(
+        "Procedure",
+        related_name="specialists",
+        verbose_name="Какие услуги делает",
+        blank=True,
+    )
     bio = models.TextField("Специальность", blank=True)
     experience = models.TextField("Стаж работы", blank=True)
     is_active = models.BooleanField("Активен", default=True)
