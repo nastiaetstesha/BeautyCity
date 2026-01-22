@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator, FileExtensionValidator
 from django.db import models
 from django.utils import timezone
 
@@ -13,7 +13,13 @@ phone_validator = RegexValidator(
 class Salon(models.Model):
     name = models.CharField("Название", max_length=200)
     address = models.CharField("Адрес", max_length=300)
-    image = models.ImageField("Фото салона", upload_to="salons/", blank=True, null=True)
+    image = models.FileField(
+        "Фото салона",
+        upload_to="salons/",
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(["svg", "png", "jpg", "jpeg", "webp"])],
+    )
     phone = models.CharField("Телефон салона", max_length=20, blank=True)
     is_active = models.BooleanField("Активен", default=True)
 
@@ -28,7 +34,11 @@ class Salon(models.Model):
 
 class Procedure(models.Model):
     title = models.CharField("Процедура", max_length=200)
-    image = models.ImageField("Фото услуги", upload_to="procedures/", blank=True, null=True)
+    image = models.FileField("Фото услуги", upload_to="procedures/",
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(["svg", "png", "jpg", "jpeg", "webp"])],
+    )
     description = models.TextField("Описание", blank=True)
     duration_minutes = models.PositiveIntegerField("Длительность (мин)", default=60)
     base_price = models.DecimalField("Базовая цена", max_digits=10, decimal_places=2)
@@ -63,8 +73,19 @@ class ProcedureOffering(models.Model):
 
 class Specialist(models.Model):
     full_name = models.CharField("ФИО", max_length=200)
-    photo = models.ImageField("Фото мастера", upload_to="specialists/", blank=True, null=True)
-    bio = models.TextField("О специалисте", blank=True)
+    photo = models.FileField("Фото мастера", upload_to="specialists/",
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(["svg", "png", "jpg", "jpeg", "webp"])],
+    )
+    procedures = models.ManyToManyField(
+        "Procedure",
+        related_name="specialists",
+        verbose_name="Какие услуги делает",
+        blank=True,
+    )
+    bio = models.TextField("Специальность", blank=True)
+    experience = models.TextField("Стаж работы", blank=True)
     is_active = models.BooleanField("Активен", default=True)
 
     class Meta:
@@ -218,6 +239,7 @@ class Booking(models.Model):
 
     customer_name = models.CharField("Имя клиента", max_length=120, blank=True)
     phone = models.CharField("Телефон", max_length=20, validators=[phone_validator])
+    question = models.CharField("Вопрос", max_length=300, null=True, blank=True)
 
     start_at = models.DateTimeField("Начало")
     end_at = models.DateTimeField("Конец")
