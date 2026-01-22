@@ -136,48 +136,30 @@
 						</div>
 					</div>
 				</div>
+				<!-- !!!!!! -->
 				<div class="title dec">Наши салоны</div>
-				<div class="row salonsSlider">
-					<div class="col-6 col-md-4 col-lg-4 col-xl-3">
+				<div class="salonsSlider">
+					{% for salon in salons %}
+						<!-- <div class="col-6 col-md-4 col-lg-4 col-xl-3"> -->
 						<div class="salons__block">
-							<img src="{% static 'img/salons/salon1.svg' %}" alt="salon" class="salons__block_img">
+							{% if salon.image %}
+								<img src="{{ salon.image.url }}" alt="{{ salon.name }}" class="salons__block_img">
+							{% else %}
+								<img src="{% static 'img/salons/salon1.svg' %}" alt="{{ salon.name }}" class="salons__block_img">
+							{% endif %}
 							<div class="salons__elems">
-								<div class="block__title salons__elems_title">BeautyCity Пушкинская</div>
-								<div class="salons__elems_light">ул. Пушкинская, д. 78А</div>
+								<div class="block__title salons__elems_title">{{ salon.name }}</div>
+								<div class="salons__elems_light">{{ salon.address }}</div>
 							</div>
 						</div>
-					</div>
-					<div class="col-6 col-md-4 col-lg-4 col-xl-3">
-						<div class="salons__block">
-							<img src="{% static 'img/salons/salon2.svg' %}" alt="salon" class="salons__block_img">
-							<div class="salons__elems">
-								<div class="block__title salons__elems_title">BeautyCity Ленина</div>
-								<div class="salons__elems_light">ул. Ленина, д. 211</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-6 col-md-4 col-lg-4 col-xl-3">
-						<div class="salons__block">
-							<img src="{% static 'img/salons/salon3.svg' %}" alt="salon" class="salons__block_img">
-							<div class="salons__elems">
-								<div class="salons__elems_title">BeautyCity Красная</div>
-								<div class="salons__elems_light">ул. Красная, д. 10</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-6 col-md-4 col-lg-4 col-xl-3 decVis">
-						<div class="salons__block">
-							<img src="{% static 'img/salons/salon1.svg' %}" alt="salon" class="salons__block_img">
-							<div class="salons__elems">
-								<div class="salons__elems_title">BeautyCity Красная</div>
-								<div class="salons__elems_light">ул. Красная, д. 10</div>
-							</div>
-						</div>
-					</div>
-
+						<!-- </div> -->
+					{% endfor %}
 				</div>
+
+				<!-- !!!!!!! -->
 			</div>
 		</div>
+		
 	</section>
 	<section id="services">
 		<div class="container">
@@ -193,8 +175,25 @@
 						</div>
 					</div>
 				</div>
-				
+				<!-- !!!!! -->
 				<div class="row servicesSlider">
+					{% for procedure in procedures %}
+						<div class="col-md-3">
+							<div class="cardBlock services__block">
+								{% if procedure.image %}
+									<img src="{{ procedure.image.url }}" alt="{{ procedure.title }}" class="services__block_img">
+								{% else %}
+									<img src="{% static 'img/services/service1.svg' %}" alt="{{ procedure.title }}" class="services__block_img">
+								{% endif %}
+
+								<div class="services__elems">
+									<div class="services__elems_title">{{ procedure.title }}</div>
+									<div class="services__elems_light">{{ procedure.base_price|floatformat:0 }} ₽</div>
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+						<!-- 	!!!!! -->
 					<div class="col-md-3">
 						<div class="cardBlock services__block">
 							<img src="{% static 'img/services/service1.svg' %}" alt="service" class="services__block_img">
@@ -269,22 +268,35 @@
 						</div>
 					</div>
 				</div>
-				
+				<!-- !!!!! -->
 				<div class="row mastersSlider">
-					<div class="col-md-3">
-						<div class="cardBlock masters__block">
+					<!-- <div class="cardBlock masters__block">
 							<div class="masters__header fic">
 								<img src="{% static 'img/masters/master1.svg' %}" alt="master" class="masters__header_img">
 								<div class="masters__header_elmes">
-									<div class="masters__header_name">Елизавета Лапина</div>
+									<div class="masters__header_name">Елизавета Лапина</div> -->
+					{% for s in specialists %}
+  						<div class="col-md-3">
+							<div class="cardBlock masters__block">
+								<div class="masters__header fic">
+									{% if s.photo %}
+									<img src="{{ s.photo.url }}" alt="{{ s.full_name }}" class="masters__header_img">
+									{% else %}
+									<img src="{% static 'img/masters/master1.svg' %}" alt="{{ s.full_name }}" class="masters__header_img">
+									{% endif %}
+
+									<div class="masters__header_elmes">
+          								<div class="masters__header_name">{{ s.full_name }}</div>
+
 									<img src="{% static 'img/rating.svg' %}" alt="rating" class="masters__header_rating">
 									<div class="masters__header_reviews">24 отзыва</div>
 								</div>
 							</div>
 							<div class="masters__main">
 								<div class="masters__main_speciality">СПЕЦИАЛЬНОСТЬ:</div>
-								<div class="masters__main_intro">Мастер маникюра</div>
+								<div class="masters__main_intro">{{ s.bio|default:"Специалист" }}</div>
 							</div>
+
 							<div class="masters__footer fic">
 								<div class="masters__footer_block">
 									<div class="masters__footer_light">СТАЖ РАБОТЫ:</div>
@@ -361,14 +373,15 @@
 							<div class="masters__footer fic">
 								<div class="masters__footer_block">
 									<div class="masters__footer_light">СТАЖ РАБОТЫ:</div>
-									<div class="masters__footer_num">1 г. 1 мес.</div>
+									<div class="masters__footer_num">{{ s.experience|default:"" }}</div>
 								</div>
 								<!-- <button class="masters__footer_btn">Записаться</button> -->
 								<a href="{% url 'service' %}" class="masters__footer_btn">Записаться</a>
 							</div>
 						</div>
 					</div>
-					<div class="col-md-3">
+				{% endfor %}
+					<!-- <div class="col-md-3">
 						<div class="cardBlock masters__block">
 							<div class="masters__header fic">
 								<img src="{% static 'img/masters/master5.svg' %}" alt="master" class="masters__header_img">
@@ -387,8 +400,8 @@
 									<div class="masters__footer_light">СТАЖ РАБОТЫ:</div>
 									<div class="masters__footer_num">3 г. 1 мес.</div>
 								</div>
-								<!-- <button class="masters__footer_btn">Записаться</button> -->
-								<a href="{% url 'service' %}" class="masters__footer_btn">Записаться</a>
+								<-- <button class="masters__footer_btn">Записаться</button> -->
+								<!-- <a href="{% url 'service' %}" class="masters__footer_btn">Записаться</a>
 							</div>
 						</div>
 					</div>
@@ -411,11 +424,11 @@
 									<div class="masters__footer_light">СТАЖ РАБОТЫ:</div>
 									<div class="masters__footer_num">1 г. 1 мес.</div>
 								</div>
-								<!-- <button class="masters__footer_btn">Записаться</button> -->
+								<-- <button class="masters__footer_btn">Записаться</button> 
 								<a href="{% url 'service' %}" class="masters__footer_btn">Записаться</a>
 							</div>
 						</div>
-					</div>
+					</div> -->
 					
 					
 

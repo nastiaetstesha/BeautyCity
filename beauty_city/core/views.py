@@ -1,8 +1,17 @@
 from django.shortcuts import render
+from .models import Salon, Procedure, Specialist
 
 
 def index(request):
-    return render(request, "index.html")
+    salons = Salon.objects.filter(is_active=True)
+    procedures = Procedure.objects.all()
+    specialists = Specialist.objects.filter(is_active=True).prefetch_related("procedures")
+
+    return render(request, "index.html", {
+        "salons": salons,
+        "procedures": procedures,
+        "specialists": specialists,
+    })
 
 
 def admin_page(request):
