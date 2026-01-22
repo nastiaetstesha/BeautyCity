@@ -1,8 +1,13 @@
 from django.shortcuts import render
+from .models import SiteSettings
+
+def get_settings():
+    # если настроек ещё нет — вернём None
+    return SiteSettings.objects.first()
 
 
 def index(request):
-    return render(request, 'index.html')
+    return render(request, "index.html", {"settings": get_settings()})
 
 
 def admin_page(request):
@@ -18,8 +23,9 @@ def popup_examples(request):
 
 
 def service(request):
-    return render(request, 'service.html')
+    return render(request, "service.html", {"settings": get_settings()})
 
 
 def service_finally(request):
-    return render(request, 'serviceFinally.html')
+    return render(request, "serviceFinally.html", {"settings": get_settings()})
+
