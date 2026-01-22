@@ -212,6 +212,30 @@ line-height: 127.52%;
 
 color: #323232;
 }
+/* Слайдер салонов: делаем нормальные отступы как в макете */
+.salonsSlider { width: 100%; }
+
+.salonsSlider .slick-list {
+  margin: 0 -15px;
+}
+
+.salonsSlider .slick-slide {
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+/* чтобы карточка заполняла высоту слайда и не “съезжала” */
+.salonsSlider .salons__block {
+  height: 100%;
+}
+
+/* картинка как у тебя */
+.salons__block_img {
+  width: 100%;
+  height: 243px;
+  object-fit: cover;
+  display: block;
+}
 
 .salons__elems_light {
 	font-weight: 500;
@@ -232,6 +256,14 @@ opacity: 0.3;
 .salonsSliderMob {
 	display: none;
 }
+/* .salonsSlider .slick-slide.col-6,
+.salonsSlider .slick-slide.col-md-4,
+.salonsSlider .slick-slide.col-lg-4,
+.salonsSlider .slick-slide.col-xl-3 {
+  flex: none !important;
+  max-width: none !important;
+  width: auto !important;
+} */
 /*End salons*/
 /* services*/
 .services .col-md-3 {

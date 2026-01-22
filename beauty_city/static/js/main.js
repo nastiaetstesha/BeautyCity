@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	$('.salonsSlider').slick({
 		arrows: true,
-	  slidesToShow: 4,
+	  slidesToShow: 3,
 	  infinite: true,
 	  prevArrow: $('.salons .leftArrow'),
 	  nextArrow: $('.salons .rightArrow'),
@@ -10,7 +10,7 @@ $(document).ready(function() {
 	      breakpoint: 991,
 	      settings: {
 	        
-	      	centerMode: true,
+	      	centerMode:  false,
   			//centerPadding: '60px',
 	        slidesToShow: 2
 	      }
