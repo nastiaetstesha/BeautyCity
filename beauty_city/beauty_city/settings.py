@@ -15,9 +15,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-
+YOOKASSA_SHOP_ID = os.getenv('YOOKASSA_SHOP_ID')
+YOOKASSA_SECRET_KEY = os.getenv('YOOKASSA_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
+YOOKASSA_TEST_MODE = True
 DEBUG = True
+
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
@@ -32,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -105,6 +109,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+SITE_URL = 'http://localhost:8000'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
