@@ -262,8 +262,8 @@
 							</div>
 							<div class="col-md-3">
 								<!-- <a href="tel:+79179023800" class="contacts__info_tel">+7 (917) 902 38 00</a> -->
-								{% if settings and settings.phone %}
-  									<a href="tel:{{ settings.phone }}" class="contacts__info_tel">{{ settings.phone_pretty|default:settings.phone }}</a>
+								{% if settings and settings.manager_phone %}
+  									<a href="tel:{{ settings.manager_phone }}" class="contacts__info_tel">{{ settings.manager_phone_pretty|default:settings.manager_phone }}</a>
 								{% endif %}
 							</div>
 						</div>
