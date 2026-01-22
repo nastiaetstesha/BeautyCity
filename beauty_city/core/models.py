@@ -247,6 +247,8 @@ class Booking(models.Model):
 
     created_at = models.DateTimeField("Создана", auto_now_add=True)
 
+    payment_id = models.CharField('ID платежа', max_length=100, blank=True)
+
     class Meta:
         verbose_name = "Запись"
         verbose_name_plural = "Записи"

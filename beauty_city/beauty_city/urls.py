@@ -18,10 +18,18 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from core.payment_views import create_payment, yookassa_webhook, payment_success
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('create-payment/<int:booking_id>/', create_payment, name='create_payment'),
+    path('yookassa-webhook/', yookassa_webhook, name='yookassa_webhook'),
+    path('payment-success/', payment_success, name='payment_success'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
