@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-load_dotenv(".env")
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,10 +14,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-
+SECRET_KEY = 'django-insecure-&t0t#$%sqqe01hd*)^n_@4iqxv=z^oxpv=292oyeau6=t#_)62'
+YOOKASSA_SHOP_ID = os.getenv('YOOKASSA_SHOP_ID')
+YOOKASSA_SECRET_KEY = os.getenv('YOOKASSA_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
+YOOKASSA_TEST_MODE = True
 DEBUG = True
+
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
@@ -56,6 +59,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "core.context_processors.site_settings",
             ],
         },
     },
@@ -105,6 +109,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+SITE_URL = 'http://localhost:8000'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

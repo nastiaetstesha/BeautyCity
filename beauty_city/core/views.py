@@ -1,75 +1,86 @@
-import json
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.utils.dateparse import parse_date
-from .models import PromoCode, ProcedureOffering
+from datetime import datetime
+
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+
+from .models import Salon, Procedure, Specialist, SiteSettings
+from .slots import get_available_slots
 
 
 def index(request):
-    return render(request, 'index.html')
+    salons = Salon.objects.filter(is_active=True)
+    procedures = Procedure.objects.all()
+    specialists = Specialist.objects.filter(is_active=True).prefetch_related("procedures")
+
+    return render(request, "index.html", {
+        "salons": salons,
+        "procedures": procedures,
+        "specialists": specialists,
+    })
 
 
 def admin_page(request):
-    return render(request, 'admin.html')
+    return render(request, "admin.html")
 
 
 def notes(request):
-    return render(request, 'notes.html')
+    return render(request, "notes.html")
 
 
 def popup_examples(request):
-    return render(request, 'popup.html')
+    return render(request, "popup.html")
 
 
 def service(request):
-    return render(request, 'service.html')
+    salons = Salon.objects.filter(is_active=True)
+    procedures = Procedure.objects.all()
+    specialists = Specialist.objects.filter(is_active=True)
+
+    salon_id = request.GET.get("salon")
+    procedure_id = request.GET.get("procedure")
+    specialist_id = request.GET.get("specialist")
+    date_str = request.GET.get("date")
+
+    if date_str:
+        try:
+            selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            selected_date = timezone.localdate()
+    else:
+        selected_date = timezone.localdate()
+
+    selected_salon = Salon.objects.filter(pk=salon_id).first() if salon_id else None
+    selected_procedure = Procedure.objects.filter(pk=procedure_id).first() if procedure_id else None
+    selected_specialist = Specialist.objects.filter(pk=specialist_id).first() if specialist_id else None
+
+    context = {
+        "salons": salons,
+        "procedures": procedures,
+        "specialists": specialists,
+        "selected_date": selected_date,
+        "selected_salon_id": salon_id,
+        "selected_procedure_id": procedure_id,
+        "selected_specialist_id": specialist_id,
+        "selected_salon": selected_salon,
+        "selected_procedure": selected_procedure,
+        "selected_specialist": selected_specialist,
+    }
+
+    if salon_id and procedure_id and specialist_id:
+        salon = get_object_or_404(Salon, pk=salon_id)
+        procedure = get_object_or_404(Procedure, pk=procedure_id)
+        specialist = get_object_or_404(Specialist, pk=specialist_id)
+
+        slots = get_available_slots(
+            salon=salon,
+            specialist=specialist,
+            procedure=procedure,
+            date=selected_date,
+        )
+        context["time_slots"] = slots
+
+    return render(request, "service.html", context)
 
 
 def service_finally(request):
-    return render(request, 'serviceFinally.html')
-
-
-@csrf_exempt
-@require_POST
-def validate_promo(request):
-    try:
-        data = json.loads(request.body)
-        code = data.get("promo_code", "").strip()
-        procedure_offering_id = data.get("procedure_offering_id")
-    except (ValueError, TypeError, json.JSONDecodeError):
-        return JsonResponse({"error": "Некорректные данные"}, status=400)
-
-    if not procedure_offering_id:
-        return JsonResponse({"error": "Не указана услуга"}, status=400)
-
-    # Получаем реальную цену из базы
-    try:
-        offering = ProcedureOffering.objects.get(id=procedure_offering_id)
-        base_price = float(offering.price)
-    except ProcedureOffering.DoesNotExist:
-        return JsonResponse({
-            "valid": False,
-            "error": "Услуга не найдена"
-        })
-
-    # Проверяем промокод
-    try:
-        promo = PromoCode.objects.get(code__iexact=code, is_active=True)
-    except PromoCode.DoesNotExist:
-        return JsonResponse({
-            "valid": False,
-            "error": "Промокод не найден или неактивен"
-        })
-
-    # Считаем новую цену
-    discount = base_price * promo.discount_percent / 100
-    new_price = round(base_price - discount, 2)
-
-    return JsonResponse({
-        "valid": True,
-        "discount_percent": promo.discount_percent,
-        "new_price": new_price,
-        "original_price": base_price
-    })
+    return render(request, "serviceFinally.html")

@@ -51,7 +51,9 @@
 					</div>
 					<div class="row">
 						<div class="col-md-12">
-							<button class="mobMenu__btn">Перезвоните мне</button>
+							<!-- <button class="mobMenu__btn">Перезвоните мне</button> -->
+							<a href="#contacts" class="mobMenu__btn">Перезвоните мне</a>
+
 						</div>
 					</div>
 				</div>
@@ -107,115 +109,84 @@
 					<button class="service__btn btn">Запись по телефону</button>
 				</div>
 				
-				<form action="#" class="service__form">
-					<!-- <select name="selectSalon" id="" class="service__form_select">
-						<option value="" selected>(Выберите салон)</option>
-						<option value="salon1" >Салон 1</option>
-						<option value="salon2" >Салон 2</option>
-						<option value="salon3" >Салон 3</option>
-					</select> -->
-					<div class="service__form_block service__salons">
-						<button class="accordion">(Выберите салон)</button>
-						<div class="panel">
-						  <div class="accordion__block fic">
-						  	<div class="accordion__block_intro">BeautyCity Пушкинская</div>
-						  	<div class="accordion__block_address">ул. Пушкинская, д. 78А</div>
-						  </div>
-						  <div class="accordion__block fic">
-						  	<div class="accordion__block_intro">BeautyCity Ленина</div>
-						  	<div class="accordion__block_address">ул. Ленина, д. 211</div>
-						  </div>
-						  <div class="accordion__block fic">
-						  	<div class="accordion__block_intro">BeautyCity Красная</div>
-						  	<div class="accordion__block_address">ул. Красная, д. 10</div>
-						  </div>
-						</div>
-					</div>
-					<div class="service__form_block service__services">
-						<button class="accordion">(Выберите услугу)</button>
-						<div class="panel">
-							<button class="accordion">Парикмахерские услуги</button>
-						 	<div class="panel">
-							  
-							  	<!-- <div class="accordion__block_intro">Макияж</div> -->
-							  		<div class="accordion__block_items">
-							  			<div class="accordion__block_item fic">
-							  				<div class="accordion__block_item_intro">Окрашивание волос</div>
-									  		<div class="accordion__block_item_address">5 000 ₽</div>
-							  			</div>
+				<form method="get" class="service__form">
+    			<input type="hidden" name="salon" value="{{ selected_salon_id|default_if_none:'' }}">
+    			<input type="hidden" name="procedure" value="{{ selected_procedure_id|default_if_none:'' }}">
+    			<input type="hidden" name="specialist" value="{{ selected_specialist_id|default_if_none:'' }}">
+    			<input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
 
-							  			<div class="accordion__block_item fic">
-							  				<div class="accordion__block_item_intro">Укладка волос</div>
-									  		<div class="accordion__block_item_address">1 500 ₽</div>
-							  			</div>	
-								  </div>
-							  
-							</div>
-						 	<button class="accordion">Ногтевой сервис</button>
-							<div class="panel">
-							  
-							  	<!-- <div class="accordion__block_intro">Макияж</div> -->
-							  		<div class="accordion__block_items">
-							  			<div class="accordion__block_item fic">
-							  				<div class="accordion__block_item_intro">Маникюр. Классический</div>
-									  		<div class="accordion__block_item_address">1 400 ₽</div>
-							  			</div>
+    			{# --- САЛОН --- #}
+    			<div class="service__form_block service__salons">
+        			<button class="accordion{% if selected_salon %} selected{% endif %}">
+            			{% if selected_salon %}
+                			{{ selected_salon.name }}  {{ selected_salon.address }}
+            			{% else %}
+                			(Выберите салон)
+            			{% endif %}
+        			</button>
+        			<div class="panel">
+						{% for salon in salons %}
+							<div
+                    			class="accordion__block fic js-salon-option{% if salon.id|stringformat:'s' == selected_salon_id %} active{% endif %}"
+                    			data-salon-id="{{ salon.id }}"
+                			>
+                    			<div class="accordion__block_intro">{{ salon.name }}</div>
+                    			<div class="accordion__block_address">{{ salon.address }}</div>
+                			</div>
+            			{% endfor %}
+        			</div>
+    			</div>
 
-							  			<div class="accordion__block_item fic">
-							  				<div class="accordion__block_item_intro">Педикюр</div>
-									  		<div class="accordion__block_item_address">1 400 ₽</div>
-							  			</div>
-							  			<div class="accordion__block_item fic">
-							  				<div class="accordion__block_item_intro">Наращивание ногтей</div>
-									  		<div class="accordion__block_item_address">1 400 ₽</div>
-							  			</div>
-								  </div>
-							  
-							</div>
-						 <!--  <div class="accordion__block">
-						  	<div class="accordion__block_intro">Парикмахерские услуги</div>
-						  </div>
-						  <div class="accordion__block">
-						  	<div class="accordion__block_intro">Ногтевой сервис</div>
-						  </div> -->
-						  <button class="accordion">Макияж</button>
-						  <div class="panel">
+    			{# --- УСЛУГА --- #}
+    			<div class="service__form_block service__services">
+        			<button class="accordion{% if selected_procedure %} selected{% endif %}">
+            			{% if selected_procedure %}
+                			{{ selected_procedure.title }}  {{ selected_procedure.base_price }} ₽
+            			{% else %}
+                			(Выберите услугу)
+            			{% endif %}
+        			</button>
+        			<div class="panel">
+            			{% for procedure in procedures %}
+                			<div
+                    			class="accordion__block fic js-procedure-option{% if procedure.id|stringformat:'s' == selected_procedure_id %} active{% endif %}"
+								data-procedure-id="{{ procedure.id }}"
+                			>
+                    			<div class="accordion__block_item_intro">{{ procedure.title }}</div>
+                    			<div class="accordion__block_item_address">{{ procedure.base_price }} ₽</div>
+                			</div>
+            			{% endfor %}
+        			</div>
+    			</div>
 
-							  
-							  	<!-- <div class="accordion__block_intro">Макияж</div> -->
-							  		<div class="accordion__block_items">
-							  			<div class="accordion__block_item fic">
-							  				<div class="accordion__block_item_intro">Дневной макияж</div>
-									  		<div class="accordion__block_item_address">1 400 ₽</div>
-							  			</div>
+    			{# --- МАСТЕР --- #}
+   			 	<div class="service__form_block service__masters">
+        			<button class="accordion{% if selected_specialist %} selected{% endif %}">
+            			{% if selected_specialist %}
+                			{{ selected_specialist.full_name }}
+            			{% else %}
+                			(Выберите мастера)
+            			{% endif %}
+        			</button>
+        			<div class="panel">
+            			{% for specialist in specialists %}
+                			<div
+                    			class="accordion__block fic js-specialist-option{% if specialist.id|stringformat:'s' == selected_specialist_id %} active{% endif %}"
+                    			data-specialist-id="{{ specialist.id }}"
+                			>
+                    			{% if specialist.photo %}
+                        			<img src="{{ specialist.photo.url }}" alt="{{ specialist.full_name }}" class="accordion__block_img">
+                    			{% endif %}
+                    			<div class="accordion__block_master">{{ specialist.full_name }}</div>
+                    			{% if specialist.bio %}
+                        			<div class="accordion__block_address">{{ specialist.bio }}</div>
+                    			{% endif %}
+                			</div>
+            			{% endfor %}
+        			</div>
+    			</div>
+			</form>
 
-							  			<div class="accordion__block_item fic">
-							  				<div class="accordion__block_item_intro">Свадебный макияж</div>
-									  		<div class="accordion__block_item_address">3 000 ₽</div>
-							  			</div>
-							  			<div class="accordion__block_item fic">
-							  				<div class="accordion__block_item_intro">Вечерний макияж</div>
-									  		<div class="accordion__block_item_address">2 000 ₽</div>
-							  			</div>
-								  </div>
-							  
-							</div>
-						</div>
-					</div>
-					<div class="service__form_block service__masters">
-						<button class="accordion">(Выберите мастера)</button>
-						<div class="panel">
-						</div>
-					</div>
-					<!-- Добавление промкода -->
-					<div class="service__form_block service__promo">
-						<h3>Промокод</h3>
-						<div class="service__form_input_group">
-							<input type="text" id="promo-input" placeholder="Введите промокод" class="service__form_input">
-							<div id="promo-result" class="promo-result"></div>
-						</div>							
-					</div>					
-				</form>
 			</div>
 		</div>
 	</section>
@@ -230,34 +201,31 @@
 						</div>
 						<div class="col-md-8">
 							<div class="time__elems">
-								<div class="time__items">
-									<div class="time__elems_intro">Утро</div>
-									<div class="time__elems_elem fic">
-										<button data-time="10:00" class="time__elems_btn">10:00</button>
-										<button data-time="10:30" class="time__elems_btn">10:30</button>
-									</div>
-								</div>
-								<div class="time__items">
-									<div class="time__elems_intro">День</div>
-									<div class="time__elems_elem fic">
-										<button data-time="12:00" class="time__elems_btn">12:00</button>
-										<button data-time="12:30" class="time__elems_btn">12:30</button>
-										<button data-time="15:00" class="time__elems_btn">15:00</button>
-										<button data-time="16:30" class="time__elems_btn">16:30</button>
-									</div>
-								</div>
-								<div class="time__items">
-									<div class="time__elems_intro">Вечер</div>
-									<div class="time__elems_elem fic">
-										<button data-time="17:00" class="time__elems_btn">17:00</button>
-										<button data-time="18:30" class="time__elems_btn">18:30</button>
-										<button data-time="19:00" class="time__elems_btn">19:00</button>
-									</div>
-								</div>
+    							{% if time_slots %}
+        							<div class="time__items">
+            							<div class="time__elems_intro">Доступное время</div>
+            							<div class="time__elems_elem fic">
+                							{% for t in time_slots %}
+                    							<button
+                        							type="button"
+                        							class="time__elems_btn js-time-slot"
+													data-time="{{ t|time:'H:i' }}"
+                    							>
+                        							{{ t|time:"H:i" }}
+                   		 						</button>
+                							{% endfor %}
+            							</div>
+        							</div>
+    							{% else %}
+        							<div class="time__items">
+            							<div class="time__elems_intro">На выбранную дату свободных слотов нет</div>
+        							</div>
+    							{% endif %}
 							</div>
 						</div>
 					</div>
 				</div>
+
 				<div class="time__btns">
 					<div class="row">
 						<div class="col-md-12">
@@ -296,7 +264,10 @@
 									
 							</div>
 							<div class="col-md-3">
-								<a href="tel:+79179023800" class="contacts__info_tel">+7 (917) 902 38 00</a>
+								<!-- <a href="tel:+79179023800" class="contacts__info_tel">+7 (917) 902 38 00</a> -->
+								{% if settings and settings.manager_phone %}
+  									<a href="tel:{{ settings.manager_phone }}" class="contacts__info_tel">{{ settings.manager_phone_pretty|default:settings.manager_phone }}</a>
+								{% endif %}
 							</div>
 						</div>
 						<div class="row">
@@ -341,78 +312,71 @@
 	</footer>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js" integrity="sha512-XtmMtDEcNz2j7ekrtHvOVR4iwwaD6o/FUJe6+Zq+HgcCsk3kj4uSQQR8weQ2QVj1o0Pk6PwYLohm206ZzNfubg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	
-	<script src="{% static 'js/main.js' %}"></script>
 
 	<script>
-	// Глобальная переменная для хранения ID выбранной услуги
-	let selectedProcedureId = null;
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.service__form');
+            if (!form) return;
 
-	// Обработчик выбора услуги
-	document.addEventListener('click', function(e) {
-		const target = e.target.closest('.accordion__block_item');
-		if (target) {
-			selectedProcedureId = target.getAttribute('data-procedure-id');
-			console.log('Выбрана услуга с ID:', selectedProcedureId);
-			// Сбрасываем поле промокода и результат
-			document.getElementById('promo-input').value = '';
-			document.getElementById('promo-result').innerHTML = '';
-		}
-	});
+            const salonInput = form.querySelector('input[name="salon"]');
+            const procedureInput = form.querySelector('input[name="procedure"]');
+            const specialistInput = form.querySelector('input[name="specialist"]');
+            const dateInput = form.querySelector('input[name="date"]');
 
-	// Функция проверки промокода
-	async function checkPromo() {
-		const promoInput = document.getElementById('promo-input');
-		const code = promoInput.value.trim();
-		const resultDiv = document.getElementById('promo-result');
+            // --- выбор салона ---
+            document.querySelectorAll('.js-salon-option').forEach(el => {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    salonInput.value = this.dataset.salonId;
+                    form.submit();
+                });
+            });
 
-		// Сброс результата
-		resultDiv.innerHTML = '';
+            // --- выбор услуги ---
+            document.querySelectorAll('.js-procedure-option').forEach(el => {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    procedureInput.value = this.dataset.procedureId;
+                    form.submit();
+                });
+            });
 
-		if (!code) return;
+            // --- выбор мастера ---
+            document.querySelectorAll('.js-specialist-option').forEach(el => {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    specialistInput.value = this.dataset.specialistId;
+                    form.submit();
+                });
+            });
 
-		if (!selectedProcedureId) {
-			resultDiv.innerHTML = '<span style="color:red">Сначала выберите услугу</span>';
-			return;
-		}
+            // --- календарь (AirDatepicker) ---
+            if (window.AirDatepicker) {
+                const initialDate = "{{ selected_date|date:'Y-m-d' }}";
 
-		try {
-			const res = await fetch('/api/validate-promo/', {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({ 
-					promo_code: code, 
-					procedure_offering_id: selectedProcedureId 
-				})
-			});
-			
-			const data = await res.json();
-			
-			if (data.valid) {
-				// Обновляем цену в HTML
-				const priceElement = document.querySelector('.accordion__block_item_address');
-				if (priceElement) {
-					priceElement.textContent = `${data.new_price} ₽`;
-				}
-				
-				resultDiv.innerHTML = `
-					✅ Скидка ${data.discount_percent}%.<br>
-					Новая цена: <strong>${data.new_price} ₽</strong>
-				`;
-			} else {
-				resultDiv.innerHTML = `<span style="color:red">${data.error}</span>`;
-			}
-		} catch (error) {
-			resultDiv.innerHTML = '<span style="color:red">Ошибка соединения</span>';
-		}
-	}
+                new AirDatepicker('#datepickerHere', {
+                    selectedDates: initialDate ? [new Date(initialDate)] : [],
+                    onSelect({ date }) {
+                        if (!date) return;
+                        const yyyy = date.getFullYear();
+                        const mm = String(date.getMonth() + 1).padStart(2, '0');
+                        const dd = String(date.getDate()).padStart(2, '0');
+                        dateInput.value = `${yyyy}-${mm}-${dd}`;
+                        form.submit();
+                    },
+                });
+            }
 
-	// Обработчик ввода промокода (с задержкой)
-	let debounceTimer;
-	document.getElementById('promo-input').addEventListener('input', function() {
-		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(checkPromo, 500);
-	});
-	</script>
+            // --- выбор времени (пока только визуально) ---
+            document.querySelectorAll('.js-time-slot').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('.js-time-slot').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    // здесь потом добавим переход на страницу с подтверждением (serviceFinally)
+                });
+            });
+        });
+    </script>
+	<script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
