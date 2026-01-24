@@ -229,7 +229,7 @@
 				<div class="time__btns">
 					<div class="row">
 						<div class="col-md-12">
-							<button  class="time__btns_next">Далее</button>
+							<button type="button" class="time__btns_next" onclick="goToFinally()">Далее</button>
 							<button  class="time__btns_home">На главную</button>
 						</div>
 					</div>
@@ -368,15 +368,46 @@
             }
 
             // --- выбор времени (пока только визуально) ---
-            document.querySelectorAll('.js-time-slot').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    document.querySelectorAll('.js-time-slot').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    // здесь потом добавим переход на страницу с подтверждением (serviceFinally)
-                });
-            });
+            document.addEventListener('click', function(e) {
+				const timeSlot = e.target.closest('.js-time-slot');
+				if (timeSlot) {
+					// Убираем active у всех кнопок
+					document.querySelectorAll('.js-time-slot').forEach(btn => {
+						btn.classList.remove('active');
+					});
+					// Добавляем active к выбранной
+					timeSlot.classList.add('active');
+				}
+			});
         });
     </script>
+
+	<script>
+	function goToFinally() {
+		const params = new URLSearchParams();
+		
+		const salonId = document.querySelector('input[name="salon"]').value;
+		const procedureId = document.querySelector('input[name="procedure"]').value;
+		const specialistId = document.querySelector('input[name="specialist"]').value;
+		const date = document.querySelector('input[name="date"]').value;
+		
+		const activeTimeBtn = document.querySelector('.js-time-slot.active');
+		const time = activeTimeBtn ? activeTimeBtn.dataset.time : '';
+
+		if (!salonId || !procedureId || !specialistId || !date || !time) {
+			alert('Выберите все параметры!');
+			return;
+		}
+
+		params.append('salon', salonId);
+		params.append('procedure', procedureId);
+		params.append('specialist', specialistId);
+		params.append('date', date);
+		params.append('time', time);
+
+		window.location.href = `/service/finally/?${params.toString()}`;
+	}
+	</script>
 	<script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

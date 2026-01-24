@@ -1,3 +1,11 @@
+import json
+from decimal import Decimal
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from .models import PromoCode, Procedure
+
+
 from datetime import datetime
 
 from django.shortcuts import render, get_object_or_404
@@ -83,4 +91,83 @@ def service(request):
 
 
 def service_finally(request):
-    return render(request, "serviceFinally.html")
+        # Получаем данные из URL
+    salon_id = request.GET.get("salon")
+    procedure_id = request.GET.get("procedure")
+    specialist_id = request.GET.get("specialist")
+    date_str = request.GET.get("date")
+    time_str = request.GET.get("time")
+
+    context = {}
+    
+    if salon_id:
+        context["salon"] = Salon.objects.filter(pk=salon_id).first()
+    if procedure_id:
+        context["procedure"] = Procedure.objects.filter(pk=procedure_id).first()
+    if specialist_id:
+        context["specialist"] = Specialist.objects.filter(pk=specialist_id).first()
+    
+    context.update({
+        "date": date_str,
+        "time": time_str,
+    })
+
+    return render(request, "serviceFinally.html", context)
+
+
+@csrf_exempt
+@require_POST
+def validate_promo(request):
+    try:
+        data = json.loads(request.body)
+        code = data.get("promo_code", "").strip()
+        procedure_id = data.get("procedure_id")
+    except (ValueError, TypeError, json.JSONDecodeError):
+        return JsonResponse({"error": "Некорректные данные"}, status=400)
+
+    if not procedure_id:
+        return JsonResponse({"error": "Не указана процедура"}, status=400)
+
+    # Получаем базовую цену из общей процедуры
+    try:
+        procedure = Procedure.objects.get(id=procedure_id)
+        base_price = procedure.base_price  # Это Decimal!
+    except Procedure.DoesNotExist:
+        return JsonResponse({
+            "valid": False,
+            "error": "Процедура не найдена"
+        })
+
+    # Проверяем промокод
+    try:
+        promo = PromoCode.objects.get(code__iexact=code, is_active=True)
+    except PromoCode.DoesNotExist:
+        return JsonResponse({
+            "valid": False,
+            "error": "Промокод не найден или неактивен"
+        })
+
+    from datetime import date
+    today = date.today()
+
+    if promo.valid_from and promo.valid_from > today:
+        return JsonResponse({
+            "valid": False,
+            "error": "Промокод ещё не активен"
+        })
+    if promo.valid_to and promo.valid_to < today:
+        return JsonResponse({
+            "valid": False,
+            "error": "Срок действия промокода истёк"
+        })
+
+    # Считаем новую цену
+    discount = base_price * Decimal(promo.discount_percent) / Decimal(100)
+    new_price = (base_price - discount).quantize(Decimal('0.01'))
+
+    return JsonResponse({
+        "valid": True,
+        "discount_percent": promo.discount_percent,
+        "new_price": str(new_price),
+        "original_price": str(base_price)
+    })

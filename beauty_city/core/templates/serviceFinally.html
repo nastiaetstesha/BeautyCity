@@ -119,21 +119,34 @@
 									</div>
 								</div>
 								<div class="serviceFinally__form_content">
+									<!-- Услуга -->
 									<div class="serviceFinally__form_content__block fic">
-										<div class="serviceFinally__form_content__title">Дневной макияж</div>
-										<div class="serviceFinally__form_content__price">750 ₽</div>
+										<div class="serviceFinally__form_content__title">{{ procedure.title }}</div>
+										<div class="serviceFinally__form_content__price" id="original-price">{{ procedure.base_price }} ₽</div>
 									</div>
+									<!-- Мастер, дата, время -->
 									<div class="serviceFinally__form_content__block fic">
 										<div class="serviceFinally__form_content__items fic">
-										  	<img src="{% static 'img/masters/avatar/vizajist1.svg' %}" alt="avatar" class="accordion__block_img">
-										  	<div class="accordion__block_master">Елена Грибнова</div>
+										  	<img src="{{ specialist.photo.url }}" alt="avatar" class="accordion__block_img">
+										  	<div class="accordion__block_master">{{ specialist.full_name }}</div>
 									    </div>
 									    <div class="serviceFinally__form_content__item fic">
-											<div class="serviceFinally__form_content__time">16:30</div>
-											<div class="serviceFinally__form_content__date">18 ноября</div>
+											<div class="serviceFinally__form_content__time">{{ time }}</div>
+											<div class="serviceFinally__form_content__date">{{ date }}</div>
 										</div>
 									</div>
-									
+									<!-- Поле для промокода -->
+									<div class="serviceFinally__form_content__block fic">
+										<div class="serviceFinally__form_content__title">Промокод</div>
+										<input type="text" id="promo-input-final" placeholder="Введите промокод" class="service__form_input">
+										<div id="promo-result-final" class="promo-result"></div>
+									</div>
+
+									<!-- Итоговая цена -->
+									<div class="serviceFinally__form_content__block fic">
+										<div class="serviceFinally__form_content__title">Итого</div>
+										<div class="serviceFinally__form_content__price" id="final-price">{{ procedure.base_price }} ₽</div>
+									</div>	
 								</div>
 							</div>
 							<div class="serviceFinally__form_itesm">
@@ -274,5 +287,82 @@
 	<script src="{% static 'js/air-datepicker.js' %}"></script>
 	<script src="{% static 'js/jquery.arcticmodal-0.3.min.js' %}"></script>
 	<script src="{% static 'js/main.js' %}"></script>
+
+	<script>
+	// Глобальные переменные
+	let originalPrice = {{ procedure.base_price|default:"0" }};
+	let finalPrice = originalPrice;
+	let promoCode = '';
+
+	// Функция проверки промокода
+	async function checkPromoFinal() {
+		const code = document.getElementById('promo-input-final').value.trim();
+		const resultDiv = document.getElementById('promo-result-final');
+		const finalPriceElement = document.getElementById('final-price');
+
+		if (!code) {
+			// Сбрасываем промокод
+			promoCode = '';
+			finalPrice = originalPrice;
+			resultDiv.innerHTML = '';
+			finalPriceElement.textContent = `${originalPrice} ₽`;
+			return;
+		}
+
+		try {
+			const res = await fetch('/api/validate-promo/', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({ 
+					promo_code: code, 
+					procedure_id: {{ procedure.id }}
+				})
+			});
+			const data = await res.json();
+
+			if (data.valid) {
+				promoCode = code;
+				finalPrice = parseFloat(data.new_price);
+				resultDiv.innerHTML = `
+					Скидка ${data.discount_percent}%.<br>
+				`;
+				finalPriceElement.textContent = `${data.new_price} ₽`;
+			} else {
+				promoCode = '';
+				finalPrice = originalPrice;
+				resultDiv.innerHTML = `<span style="color:red">${data.error}</span>`;
+				finalPriceElement.textContent = `${originalPrice} ₽`;
+			}
+		} catch (error) {
+			resultDiv.innerHTML = '<span style="color:red">Ошибка соединения</span>';
+			finalPriceElement.textContent = `${originalPrice} ₽`;
+		}
+	}
+
+	// Обработчик ввода промокода
+	document.getElementById('promo-input-final').addEventListener('input', function() {
+		clearTimeout(this.debounceTimer);
+		this.debounceTimer = setTimeout(checkPromoFinal, 500);
+	});
+
+	// Обработчик кнопки "Записаться"
+	document.querySelector('.serviceFinallys__form_btn').addEventListener('click', function(e) {
+		e.preventDefault();
+		
+		// Получаем данные формы
+		const formData = new FormData(document.querySelector('.serviceFinally__form'));
+		
+		// Добавляем промокод и финальную цену в форму
+		formData.append('promo_code', promoCode);
+		formData.append('final_price', finalPrice);
+		
+		// Отправляем форму
+		console.log('Данные для отправки:', Object.fromEntries(formData));
+		
+		// Пример: перенаправление на сайт оплаты
+		// window.location.href = `https://payment-site.com?amount=${finalPrice}&promo=${promoCode}`;
+	});
+	</script>
+
 </body>
 </html>
