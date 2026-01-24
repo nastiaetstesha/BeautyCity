@@ -154,48 +154,48 @@ $(document).ready(function() {
 			$('.service__masters > .panel').html(`
 				<div class="accordion__block fic">
 						  	<div class="accordion__block_elems fic">
-							  	<img src="img/masters/avatar/all.svg" alt="avatar" class="accordion__block_img">
+							  	<img src="/static/img/masters/avatar/all.svg" alt="avatar" class="accordion__block_img">
 							  	<div class="accordion__block_master">Любой мастер</div>
 						  	</div>
 						  </div>
 						  <div class="accordion__block fic">
 						  	<div class="accordion__block_elems fic">
-							  	<img src="img/masters/avatar/pushkinskaya/1.svg" alt="avatar" class="accordion__block_img">
+							  	<img src="/static/img/masters/avatar/pushkinskaya/1.svg" alt="avatar" class="accordion__block_img">
 							  	<div class="accordion__block_master">Елизавета Лапина</div>
 						  	</div>
 						  	<div class="accordion__block_prof">Мастер маникюра</div>
 						  </div>
 						  <div class="accordion__block fic">
 						  	<div class="accordion__block_elems fic">
-							  	<img src="img/masters/avatar/pushkinskaya/2.svg" alt="avatar" class="accordion__block_img">
+							  	<img src="/static/img/masters/avatar/pushkinskaya/2.svg" alt="avatar" class="accordion__block_img">
 							  	<div class="accordion__block_master">Анна Сергеева</div>
 						  	</div>
 						  	<div class="accordion__block_prof">Парикмахер</div>
 						  </div>
 						  <div class="accordion__block fic">
 						  	<div class="accordion__block_elems fic">
-							  	<img src="img/masters/avatar/pushkinskaya/3.svg" alt="avatar" class="accordion__block_img">
+							  	<img src="/static/img/masters/avatar/pushkinskaya/3.svg" alt="avatar" class="accordion__block_img">
 							  	<div class="accordion__block_master">Ева Колесова</div>
 						  	</div>
 						  	<div class="accordion__block_prof">Визажист</div>
 						  </div>
 						  <div class="accordion__block fic">
 						  	<div class="accordion__block_elems fic">
-							  	<img src="img/masters/avatar/pushkinskaya/4.svg" alt="avatar" class="accordion__block_img">
+							  	<img src="/static/img/masters/avatar/pushkinskaya/4.svg" alt="avatar" class="accordion__block_img">
 							  	<div class="accordion__block_master">Мария Суворова</div>
 						  	</div>
 						  	<div class="accordion__block_prof">Стилист</div>
 						  </div>
 						  <div class="accordion__block fic">
 						  	<div class="accordion__block_elems fic">
-							  	<img src="img/masters/avatar/pushkinskaya/5.svg" alt="avatar" class="accordion__block_img">
+							  	<img src="/static/img/masters/avatar/pushkinskaya/5.svg" alt="avatar" class="accordion__block_img">
 							  	<div class="accordion__block_master">Мария Максимова</div>
 						  	</div>
 						  	<div class="accordion__block_prof">Визажист</div>
 						  </div>
 						  <div class="accordion__block fic">
 						  	<div class="accordion__block_elems fic">
-							  	<img src="img/masters/avatar/pushkinskaya/6.svg" alt="avatar" class="accordion__block_img">
+							  	<img src="/static/img/masters/avatar/pushkinskaya/6.svg" alt="avatar" class="accordion__block_img">
 							  	<div class="accordion__block_master">Анастасия Сергеева</div>
 						  	</div>
 						  	<div class="accordion__block_prof">Визажист</div>

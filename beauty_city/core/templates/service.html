@@ -202,6 +202,13 @@
 							</div>
 						</div>
 					</div>
+					<!-- Добавление промкода -->
+					<div class="service__form_block service__promo">
+						<h3>Промокод</h3>
+						<input type="text" id="promo-input" placeholder="Введите промокод" class="service__form_input">
+						<button id="apply-promo" class="service__form_btn">Применить</button>
+						<div id="promo-result" class="promo-result"></div>
+					</div>
 					<div class="service__form_block service__masters">
 						<button class="accordion">(Выберите мастера)</button>
 						<div class="panel">
@@ -340,5 +347,26 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js" integrity="sha512-XtmMtDEcNz2j7ekrtHvOVR4iwwaD6o/FUJe6+Zq+HgcCsk3kj4uSQQR8weQ2QVj1o0Pk6PwYLohm206ZzNfubg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	
 	<script src="{% static 'js/main.js' %}"></script>
+
+	<script>
+	document.getElementById('apply-promo').addEventListener('click', async () => {
+		const code = document.getElementById('promo-input').value;
+		// Заглушка: ID процедуры = 1
+		const res = await fetch('/api/validate-promo/', {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({ promo_code: code, procedure_id: 1 })
+		});
+		const data = await res.json();
+		
+		if (data.valid) {
+			document.getElementById('promo-result').innerHTML = 
+				`Скидка ${data.discount_percent}%. Новая цена: ${data.new_price} ₽`;
+		} else {
+			document.getElementById('promo-result').innerHTML = 
+				`<span style="color:red">${data.error}</span>`;
+		}
+	});
+	</script>
 </body>
 </html>
