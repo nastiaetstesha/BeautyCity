@@ -202,23 +202,19 @@
 							</div>
 						</div>
 					</div>
-					<!-- Добавление промкода -->
-					<div class="service__form_block service__promo">
-						<h3>Промокод</h3>
-						<input type="text" id="promo-input" placeholder="Введите промокод" class="service__form_input">
-						<button id="apply-promo" class="service__form_btn">Применить</button>
-						<div id="promo-result" class="promo-result"></div>
-					</div>
 					<div class="service__form_block service__masters">
 						<button class="accordion">(Выберите мастера)</button>
 						<div class="panel">
-						  
 						</div>
-						  
-						
-
 					</div>
-					
+					<!-- Добавление промкода -->
+					<div class="service__form_block service__promo">
+						<h3>Промокод</h3>
+						<div class="service__form_input_group">
+							<input type="text" id="promo-input" placeholder="Введите промокод" class="service__form_input">
+							<div id="promo-result" class="promo-result"></div>
+						</div>							
+					</div>					
 				</form>
 			</div>
 		</div>
@@ -349,23 +345,73 @@
 	<script src="{% static 'js/main.js' %}"></script>
 
 	<script>
-	document.getElementById('apply-promo').addEventListener('click', async () => {
-		const code = document.getElementById('promo-input').value;
-		// Заглушка: ID процедуры = 1
-		const res = await fetch('/api/validate-promo/', {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({ promo_code: code, procedure_id: 1 })
-		});
-		const data = await res.json();
-		
-		if (data.valid) {
-			document.getElementById('promo-result').innerHTML = 
-				`Скидка ${data.discount_percent}%. Новая цена: ${data.new_price} ₽`;
-		} else {
-			document.getElementById('promo-result').innerHTML = 
-				`<span style="color:red">${data.error}</span>`;
+	// Глобальная переменная для хранения ID выбранной услуги
+	let selectedProcedureId = null;
+
+	// Обработчик выбора услуги
+	document.addEventListener('click', function(e) {
+		const target = e.target.closest('.accordion__block_item');
+		if (target) {
+			selectedProcedureId = target.getAttribute('data-procedure-id');
+			console.log('Выбрана услуга с ID:', selectedProcedureId);
+			// Сбрасываем поле промокода и результат
+			document.getElementById('promo-input').value = '';
+			document.getElementById('promo-result').innerHTML = '';
 		}
+	});
+
+	// Функция проверки промокода
+	async function checkPromo() {
+		const promoInput = document.getElementById('promo-input');
+		const code = promoInput.value.trim();
+		const resultDiv = document.getElementById('promo-result');
+
+		// Сброс результата
+		resultDiv.innerHTML = '';
+
+		if (!code) return;
+
+		if (!selectedProcedureId) {
+			resultDiv.innerHTML = '<span style="color:red">Сначала выберите услугу</span>';
+			return;
+		}
+
+		try {
+			const res = await fetch('/api/validate-promo/', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({ 
+					promo_code: code, 
+					procedure_offering_id: selectedProcedureId 
+				})
+			});
+			
+			const data = await res.json();
+			
+			if (data.valid) {
+				// Обновляем цену в HTML
+				const priceElement = document.querySelector('.accordion__block_item_address');
+				if (priceElement) {
+					priceElement.textContent = `${data.new_price} ₽`;
+				}
+				
+				resultDiv.innerHTML = `
+					✅ Скидка ${data.discount_percent}%.<br>
+					Новая цена: <strong>${data.new_price} ₽</strong>
+				`;
+			} else {
+				resultDiv.innerHTML = `<span style="color:red">${data.error}</span>`;
+			}
+		} catch (error) {
+			resultDiv.innerHTML = '<span style="color:red">Ошибка соединения</span>';
+		}
+	}
+
+	// Обработчик ввода промокода (с задержкой)
+	let debounceTimer;
+	document.getElementById('promo-input').addEventListener('input', function() {
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(checkPromo, 500);
 	});
 	</script>
 </body>

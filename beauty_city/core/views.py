@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.dateparse import parse_date
-from .models import PromoCode
+from .models import PromoCode, ProcedureOffering
 
 
 def index(request):
@@ -37,16 +37,24 @@ def validate_promo(request):
     try:
         data = json.loads(request.body)
         code = data.get("promo_code", "").strip()
-        procedure_id = data.get("procedure_id")
+        procedure_offering_id = data.get("procedure_offering_id")
     except (ValueError, TypeError, json.JSONDecodeError):
         return JsonResponse({"error": "Некорректные данные"}, status=400)
 
-    if not procedure_id:
-        return JsonResponse({"error": "Не указана процедура"}, status=400)
+    if not procedure_offering_id:
+        return JsonResponse({"error": "Не указана услуга"}, status=400)
 
-    # Заглушка: базовая цена = 1000 руб.
-    base_price = 1000.0
+    # Получаем реальную цену из базы
+    try:
+        offering = ProcedureOffering.objects.get(id=procedure_offering_id)
+        base_price = float(offering.price)
+    except ProcedureOffering.DoesNotExist:
+        return JsonResponse({
+            "valid": False,
+            "error": "Услуга не найдена"
+        })
 
+    # Проверяем промокод
     try:
         promo = PromoCode.objects.get(code__iexact=code, is_active=True)
     except PromoCode.DoesNotExist:
@@ -55,25 +63,13 @@ def validate_promo(request):
             "error": "Промокод не найден или неактивен"
         })
 
-    from datetime import date
-    today = date.today()
-
-    if promo.valid_from and promo.valid_from > today:
-        return JsonResponse({
-            "valid": False,
-            "error": "Промокод ещё не активен"
-        })
-    if promo.valid_to and promo.valid_to < today:
-        return JsonResponse({
-            "valid": False,
-            "error": "Срок действия промокода истёк"
-        })
-
+    # Считаем новую цену
     discount = base_price * promo.discount_percent / 100
     new_price = round(base_price - discount, 2)
 
     return JsonResponse({
         "valid": True,
         "discount_percent": promo.discount_percent,
-        "new_price": new_price
+        "new_price": new_price,
+        "original_price": base_price
     })
