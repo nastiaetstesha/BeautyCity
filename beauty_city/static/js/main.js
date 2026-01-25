@@ -195,7 +195,12 @@ $(document).ready(function() {
 			$('.time__btns_next').addClass('active')
 		}
 	})
-	
-
-
-})
+	 
+    // Автоактивация первой кнопки времени (опционально)
+    setTimeout(() => {
+        const firstTimeSlot = document.querySelector('.js-time-slot');
+        if (firstTimeSlot) {
+            firstTimeSlot.click();
+        }
+    }, 100);
+});

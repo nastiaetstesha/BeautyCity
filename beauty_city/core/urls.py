@@ -10,4 +10,6 @@ urlpatterns = [
 
     path('service/', views.service, name='service'),
     path('service/finally/', views.service_finally, name='service_finally'),
+    
+    path('api/validate-promo/', views.validate_promo, name='validate_promo'),
 ]
