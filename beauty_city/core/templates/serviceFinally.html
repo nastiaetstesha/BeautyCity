@@ -4,7 +4,6 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Beauty City - Подтверждение записи</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
@@ -92,237 +91,58 @@
 			</div>
 		</div>
 	</header>
-
 	<section id="serviceFinally">
 		<div class="container">
 			<div class="serviceFinally">
-				{% if error %}
-					<div class="error-alert" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-						⚠️ {{ error }}
-						<a href="{% url 'service' %}" style="display: block; margin-top: 10px;">Вернуться к выбору услуги</a>
-					</div>
-				{% endif %}
-
 				<div class="row">
-					<div class="col-md-7 col-lg-7">
 						<div class="breadCrumbs">
-							<a href="{% url 'index' %}" class="breadCrumbs__item">На главную</a> /
-							<a href="{% url 'service' %}" class="breadCrumbs__item">Выбор услуги</a>
 						</div>
-
 						<div class="service__block">
-							<h1 class="service__title">Подтверждение записи</h1>
 						</div>
-
-						<!-- Информация о выбранных параметрах -->
-						{% if selected_salon and selected_procedure and selected_specialist %}
-							<div class="selected-params" style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
-								<h3 style="margin-bottom: 20px;">✅ Вы выбрали:</h3>
-
-								<div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-									<strong>Салон:</strong><br>
-									{{ selected_salon.name }}<br>
-									<small style="color: #666;">{{ selected_salon.address }}</small>
 								</div>
-
-								<div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-									<strong>Услуга:</strong><br>
-									{{ selected_procedure.title }}<br>
-									<small style="color: #28a745; font-weight: bold;">{{ selected_procedure.base_price }} ₽</small>
 								</div>
-
-								<div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
-									<strong>Мастер:</strong><br>
-									{{ selected_specialist.full_name }}
 								</div>
-
-								<div style="margin-bottom: 15px;">
-									<strong>Дата и время:</strong><br>
-									{{ selected_date }} в {{ selected_time }}
 								</div>
 							</div>
-
-							<!-- Форма для подтверждения записи -->
-							<form method="POST"
-								  action="{% url 'service_finally' %}?salon={{ selected_salon.id }}&procedure={{ selected_procedure.id }}&specialist={{ selected_specialist.id }}&date={{ selected_date }}&time={{ selected_time }}"
-								  style="background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-								{% csrf_token %}
-
-								<!-- Скрытые поля формы -->
-								{{ form.salon }}
-								{{ form.procedure }}
-								{{ form.specialist }}
-
-								<h3 style="margin-bottom: 25px;">📝 Ваши контактные данные</h3>
-
-								<!-- Имя -->
-								<div style="margin-bottom: 25px;">
-									<label style="display: block; margin-bottom: 8px; font-weight: 500;">Имя *</label>
-									{{ form.customer_name }}
-									{% if form.customer_name.errors %}
-										<div style="color: #dc3545; font-size: 14px; margin-top: 5px;">
-											{{ form.customer_name.errors.0 }}
 										</div>
-									{% endif %}
 								</div>
 
-								<!-- Телефон -->
-								<div style="margin-bottom: 25px;">
-									<label style="display: block; margin-bottom: 8px; font-weight: 500;">Телефон *</label>
-									{{ form.phone }}
-									{% if form.phone.errors %}
-										<div style="color: #dc3545; font-size: 14px; margin-top: 5px;">
-											{{ form.phone.errors.0 }}
 										</div>
-									{% endif %}
-									<small style="color: #666; font-size: 14px;">На этот номер придет SMS с подтверждением</small>
+								</div>
+								</div>
+								</div>
 								</div>
 
-								<!-- Комментарий -->
-								<div style="margin-bottom: 25px;">
-									<label style="display: block; margin-bottom: 8px; font-weight: 500;">Комментарий (необязательно)</label>
-									{{ form.question }}
-								</div>
-
-								<!-- Согласие -->
-								<div style="margin: 25px 0;">
-									<input type="checkbox" id="privacyPolicy" required style="margin-right: 10px;">
-									<label for="privacyPolicy" style="color: #666;">
-										Я согласен(а) с
-										<a href="#" style="color: #007bff; text-decoration: none;">политикой обработки персональных данных</a> *
-									</label>
-								</div>
-
-								<!-- Кнопки -->
-								<div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
-									<button type="submit"
-											style="background: #28a745; color: white; border: none; padding: 16px; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; transition: background 0.3s;">
-										✅ Записаться и оплатить {{ selected_procedure.base_price }} ₽
-									</button>
-
-									<a href="{% url 'service' %}"
-									   style="display: inline-block; text-align: center; color: #6c757d; text-decoration: none; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
-										↩ Назад к выбору времени
-									</a>
-								</div>
-
-								<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-									<p style="color: #666;">Способы оплаты после записи:</p>
-									<div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px;">
-										<span style="background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">💳 Онлайн (ЮKassa)</span>
-										<span style="background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">🏢 Наличными в салоне</span>
 									</div>
 								</div>
 							</form>
-						{% else %}
-							<div style="background: #fff3cd; color: #856404; padding: 20px; border-radius: 5px; margin: 20px 0;">
-								⚠️ Не все параметры выбраны.
-								<a href="{% url 'service' %}" style="display: block; margin-top: 10px;">Вернитесь к выбору услуги</a>
 							</div>
-						{% endif %}
 					</div>
 
-					<div class="col-md-5 col-lg-5">
-						<!-- Боковая панель с информацией -->
-						<div class="info-sidebar">
-							<div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-								<h4 style="margin-bottom: 15px;">📍 Адрес салона</h4>
-								{% if selected_salon %}
-									<p>{{ selected_salon.address }}</p>
-									{% if selected_salon.phone %}
-										<p style="color: #28a745;">📞 {{ selected_salon.phone }}</p>
-									{% endif %}
 								{% endif %}
 							</div>
-
-							<div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-								<h4 style="margin-bottom: 15px;">💡 Что нужно знать</h4>
-								<ul style="padding-left: 20px;">
-									<li style="margin-bottom: 10px;">Приходите за 10 минут до записи</li>
-									<li style="margin-bottom: 10px;">Отмена за 24 часа - полный возврат</li>
-									<li>При опоздании более 15 минут запись может быть отменена</li>
 								</ul>
 							</div>
 
-							<div style="background: #fff3cd; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-								<h4 style="margin-bottom: 15px;">⚠️ Важно!</h4>
-								<p>Запись подтверждается только после оплаты.
-								Вы можете оплатить сейчас онлайн или в салоне								<h4 style="margin-bottom: 15px;">❓ Вопросы?</h4>
-								<p>Звоните:</p>
-								<a href="tel:+78001234567"
-								   style="display: inline-block; background: #17a2b8; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; margin: 10px 0;">
-									📞 8 (800) 123-45-67
-								</a>
 							</div>
-
-							<!-- Изображение -->
-							<div style="margin-top: 30px;">
-								<img src="{% static 'img/bannerImg.svg' %}" alt="bannerImg" style="width: 100%; border-radius: 10px;">
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</section>
-
-	<!-- ... существующий footer ... -->
 
 	<script>
-		$(document).ready(function() {
-			// Маска для телефона
-			$('input[name="phone"]').on('input', function() {
-				let value = $(this).val().replace(/\D/g, '');
-				if (value.length > 0) {
-					if (value[0] !== '7' && value[0] !== '8') {
-						value = '7' + value;
 					}
-					let formatted = '+7';
-					if (value.length > 1) {
-						formatted += ' (' + value.substring(1, 4);
 					}
-					if (value.length > 4) {
-						formatted += ') ' + value.substring(4, 7);
 					}
-					if (value.length > 7) {
-						formatted += '-' + value.substring(7, 9);
 					}
-					if (value.length > 9) {
-						formatted += '-' + value.substring(9, 11);
-					}
-					$(this).val(formatted);
-				}
-			});
 
-			// Проверка формы
-			$('form').on('submit', function(e) {
-				const phone = $('input[name="phone"]').val();
-				const name = $('input[name="customer_name"]').val();
-				const privacy = $('#privacyPolicy').is(':checked');
 
-				if (!name || name.trim().length < 2) {
-					alert('Пожалуйста, введите ваше имя (минимум 2 символа)');
 					e.preventDefault();
-					return false;
-				}
 
-				if (!phone || !phone.match(/^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/)) {
-					alert('Пожалуйста, введите корректный номер телефона в формате +7 (999) 999-99-99');
-					e.preventDefault();
-					return false;
-				}
 
-				if (!privacy) {
-					alert('Пожалуйста, согласитесь с политикой конфиденциальности');
-					e.preventDefault();
-					return false;
-				}
 
-				// Показать лоадер
-				$(this).find('button[type="submit"]')
-					.html('⏳ Обработка...')
-					.prop('disabled', true);
-			});
 		});
 	</script>
 </body>

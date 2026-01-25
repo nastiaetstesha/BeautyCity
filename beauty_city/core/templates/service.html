@@ -95,7 +95,6 @@
 		<div class="container">
 			<div class="service">
 				<div class="breadCrumbs">
-					<a href="{% url 'index' %}" class="breadCrumbs__item">На главную</a>
 				</div>
 				<div class="service__block">
 					<h1 class="service__title">Запись на услугу</h1>
@@ -110,7 +109,6 @@
 
     				{# --- САЛОН --- #}
     				<div class="service__form_block service__salons">
-        				<button type="button" class="accordion{% if selected_salon %} selected{% endif %}">
             				{% if selected_salon %}
                 				{{ selected_salon.name }}  {{ selected_salon.address }}
             				{% else %}
@@ -119,8 +117,6 @@
         				</button>
         				<div class="panel">
 							{% for salon in salons %}
-								<div class="accordion__block fic js-salon-option{% if salon.id|stringformat:'s' == selected_salon_id %} active{% endif %}"
-                    				data-salon-id="{{ salon.id }}">
                     				<div class="accordion__block_intro">{{ salon.name }}</div>
                     				<div class="accordion__block_address">{{ salon.address }}</div>
                 				</div>
@@ -130,7 +126,6 @@
 
     				{# --- УСЛУГА --- #}
     				<div class="service__form_block service__services">
-        				<button type="button" class="accordion{% if selected_procedure %} selected{% endif %}">
             				{% if selected_procedure %}
                 				{{ selected_procedure.title }}  {{ selected_procedure.base_price }} ₽
             				{% else %}
@@ -139,8 +134,6 @@
         				</button>
         				<div class="panel">
             				{% for procedure in procedures %}
-                				<div class="accordion__block fic js-procedure-option{% if procedure.id|stringformat:'s' == selected_procedure_id %} active{% endif %}"
-									data-procedure-id="{{ procedure.id }}">
                     				<div class="accordion__block_item_intro">{{ procedure.title }}</div>
                     				<div class="accordion__block_item_address">{{ procedure.base_price }} ₽</div>
                 				</div>
@@ -150,7 +143,6 @@
 
     				{# --- МАСТЕР --- #}
    			 		<div class="service__form_block service__masters">
-        				<button type="button" class="accordion{% if selected_specialist %} selected{% endif %}">
             				{% if selected_specialist %}
                 				{{ selected_specialist.full_name }}
             				{% else %}
@@ -159,8 +151,6 @@
         				</button>
         				<div class="panel">
             				{% for specialist in specialists %}
-                				<div class="accordion__block fic js-specialist-option{% if specialist.id|stringformat:'s' == selected_specialist_id %} active{% endif %}"
-                    				data-specialist-id="{{ specialist.id }}">
                     				{% if specialist.photo %}
                         				<img src="{{ specialist.photo.url }}" alt="{{ specialist.full_name }}" class="accordion__block_img">
                     				{% endif %}
@@ -192,9 +182,7 @@
             							<div class="time__elems_intro">Доступное время</div>
             							<div class="time__elems_elem fic">
                 							{% for t in time_slots %}
-                    							<button type="button"
                         							class="time__elems_btn js-time-slot"
-													data-time="{{ t|time:'H:i' }}">
                         							{{ t|time:"H:i" }}
                    		 						</button>
                 							{% endfor %}
@@ -202,13 +190,6 @@
         							</div>
     							{% else %}
         							<div class="time__items">
-            							<div class="time__elems_intro">
-											{% if selected_salon and selected_procedure and selected_specialist %}
-												На выбранную дату свободных слотов нет
-											{% else %}
-												Выберите салон, услугу и мастера
-											{% endif %}
-										</div>
         							</div>
     							{% endif %}
 							</div>
@@ -219,10 +200,6 @@
 				<div class="time__btns">
 					<div class="row">
 						<div class="col-md-12">
-							<button type="button" class="time__btns_next" id="confirmBookingBtn">
-								Далее к подтверждению
-							</button>
-							<a href="{% url 'index' %}" class="time__btns_home">На главную</a>
 						</div>
 					</div>
 				</div>
@@ -352,43 +329,14 @@
                 });
             }
 
-            // --- выбор времени ---
-            let selectedTime = null;
             document.querySelectorAll('.js-time-slot').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    document.querySelectorAll('.js-time-slot').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    selectedTime = this.dataset.time;
                 });
             });
 
-            // --- кнопка "Далее к подтверждению" ---
-            document.getElementById('confirmBookingBtn').addEventListener('click', function() {
-                if (!selectedTime) {
-                    alert('Пожалуйста, выберите время');
                     return;
                 }
 
-                // Проверяем, что все выбрано
-                if (!salonInput.value || !procedureInput.value || !specialistInput.value) {
-                    alert('Пожалуйста, выберите салон, услугу и мастера');
-                    return;
-                }
 
-                // Собираем URL для перехода на service_finally
-                const urlParams = new URLSearchParams(window.location.search);
-                const date = dateInput.value || urlParams.get('date') || '{{ selected_date|date:"Y-m-d" }}';
-
-                const redirectUrl = `{% url 'service_finally' %}?` +
-                    `salon=${salonInput.value}` +
-                    `&procedure=${procedureInput.value}` +
-                    `&specialist=${specialistInput.value}` +
-                    `&date=${date}` +
-                    `&time=${selectedTime}`;
-
-                window.location.href = redirectUrl;
-            });
-        });
     </script>
 	<script src="{% static 'js/main.js' %}"></script>
 </body>

@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from core.payment_views import create_payment, yookassa_webhook, payment_success
@@ -27,6 +27,7 @@ urlpatterns = [
     path('create-payment/<int:booking_id>/', create_payment, name='create_payment'),
     path('yookassa-webhook/', yookassa_webhook, name='yookassa_webhook'),
     path('payment-success/', payment_success, name='payment_success'),
+    path('', include('core.urls')),
 ]
 
 if settings.DEBUG:
