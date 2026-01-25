@@ -4,6 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Beauty City - Подтверждение записи</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,44 +18,44 @@
 </head>
 <body>
 	<section id="mobMenu">
-			<div class="mobMenu">
-				<div class="container">
-				<div class="mobMenu__header">
-					<div class="row">
-						<div class="col-4 col-md-3">
-							<a href="/">
-								<img src="{% static 'img/Logo.svg' %}" alt="Logo" class="logo header__logo">
-							</a>
-						</div>
-						<div class="col-3 col-md-2">
-							<img src="{% static 'img/x.svg' %}" alt="x" class="mobMenuClose">
-						</div>
+		<div class="mobMenu">
+			<div class="container">
+			<div class="mobMenu__header">
+				<div class="row">
+					<div class="col-4 col-md-3">
+						<a href="/">
+							<img src="{% static 'img/Logo.svg' %}" alt="Logo" class="logo header__logo">
+						</a>
+					</div>
+					<div class="col-3 col-md-2">
+						<img src="{% static 'img/x.svg' %}" alt="x" class="mobMenuClose">
 					</div>
 				</div>
-				<div class="mobMenu__content">
-					<div class="row">
-						<div class="col-md-3">
-							<nav>
-								<ul class="mobMenu__menu">
-									<li class="mobMenu__menu_item">
-										<a href="#" class="mobMenu__menu_link">Мастера</a>
-									</li>
-									<li class="mobMenu__menu_item"><a href="#" class="mobMenu__menu_link">Услуги</a></li>
-									<li class="mobMenu__menu_item"><a href="#" class="mobMenu__menu_link">Отзывы</a></li>
-									<li class="mobMenu__menu_item"><a href="#" class="mobMenu__menu_link">Контакты</a></li>
-								</ul>
-							</nav>
-							<a href="#" class="mobMenu__account">Личный кабинет</a>
-						</div>
+			</div>
+			<div class="mobMenu__content">
+				<div class="row">
+					<div class="col-md-3">
+						<nav>
+							<ul class="mobMenu__menu">
+								<li class="mobMenu__menu_item">
+									<a href="#" class="mobMenu__menu_link">Мастера</a>
+								</li>
+								<li class="mobMenu__menu_item"><a href="#" class="mobMenu__menu_link">Услуги</a></li>
+								<li class="mobMenu__menu_item"><a href="#" class="mobMenu__menu_link">Отзывы</a></li>
+								<li class="mobMenu__menu_item"><a href="#" class="mobMenu__menu_link">Контакты</a></li>
+							</ul>
+						</nav>
+						<a href="#" class="mobMenu__account">Личный кабинет</a>
 					</div>
-					<div class="row">
-						<div class="col-md-12">
-							<a href="#contacts" class="mobMenu__btn">Перезвоните мне</a>
-						</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<a href="#contacts" class="mobMenu__btn">Перезвоните мне</a>
 					</div>
 				</div>
 			</div>
 		</div>
+	</div>
 	</section>
 	<header id="header">
 		<div class="container">
@@ -91,59 +92,392 @@
 			</div>
 		</div>
 	</header>
+
 	<section id="serviceFinally">
 		<div class="container">
 			<div class="serviceFinally">
+				{% if error %}
+					<div class="error-alert" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+						⚠️ {{ error }}
+						<a href="{% url 'service' %}" style="display: block; margin-top: 10px;">Вернуться к выбору услуги</a>
+					</div>
+				{% endif %}
+
 				<div class="row">
+					<div class="col-md-7 col-lg-7">
 						<div class="breadCrumbs">
+							<a href="{% url 'index' %}" class="breadCrumbs__item">На главную</a> /
+							<a href="{% url 'service' %}" class="breadCrumbs__item">Выбор услуги</a>
 						</div>
+
 						<div class="service__block">
+							<h1 class="service__title">Подтверждение записи</h1>
 						</div>
-								</div>
-								</div>
-								</div>
-								</div>
-							</div>
-										</div>
-								</div>
 
-										</div>
-								</div>
-								</div>
-								</div>
-								</div>
+						<!-- Информация о выбранных параметрах -->
+						{% if selected_salon and selected_procedure and selected_specialist %}
+							<form method="POST"
+								  action="{% url 'service_finally' %}?salon={{ selected_salon.id }}&procedure={{ selected_procedure.id }}&specialist={{ selected_specialist.id }}&date={{ selected_date }}&time={{ selected_time }}"
+								  class="serviceFinally__form">
+								{% csrf_token %}
 
+								<div class="serviceFinally__form_block">
+									<div class="serviceFinally__form_header fic">
+										<span class="serviceFinally__form_header__number">Запись на услугу</span>
+										<div class="serviceFinally__form_header__item fic">
+											<div class="serviceFinally__form_header__service">{{ selected_salon.name }}</div>
+											<div class="serviceFinally__form_header__address">{{ selected_salon.address }}</div>
+										</div>
+									</div>
+									<div class="serviceFinally__form_content">
+										<!-- Услуга -->
+										<div class="serviceFinally__form_content__block fic">
+											<div class="serviceFinally__form_content__title">{{ selected_procedure.title }}</div>
+											<div class="serviceFinally__form_content__price" id="original-price">{{ selected_procedure.base_price }} ₽</div>
+										</div>
+										<!-- Мастер, дата, время -->
+										<div class="serviceFinally__form_content__block fic">
+											<div class="serviceFinally__form_content__items fic">
+												{% if selected_specialist.photo %}
+													<img src="{{ selected_specialist.photo.url }}" alt="avatar" class="accordion__block_img">
+												{% endif %}
+												<div class="accordion__block_master">{{ selected_specialist.full_name }}</div>
+											</div>
+											<div class="serviceFinally__form_content__item fic">
+												<div class="serviceFinally__form_content__time">{{ selected_time }}</div>
+												<div class="serviceFinally__form_content__date">{{ selected_date }}</div>
+											</div>
+										</div>
+										<!-- Поле для промокода -->
+										<div class="serviceFinally__form_content__block fic">
+											<div class="serviceFinally__form_content__title">Промокод</div>
+											<input type="text"
+												   id="promo-input-final"
+												   name="promo_code"
+												   placeholder="Введите промокод"
+												   class="service__form_input">
+											<div id="promo-result-final" class="promo-result"></div>
+										</div>
+
+										<!-- Итоговая цена -->
+										<div class="serviceFinally__form_content__block fic">
+											<div class="serviceFinally__form_content__title">Итого</div>
+											<div class="serviceFinally__form_content__price" id="final-price">{{ selected_procedure.base_price }} ₽</div>
+										</div>
 									</div>
 								</div>
+
+								<!-- Форма для подтверждения записи -->
+								<div class="serviceFinally__form_items">
+									<!-- Скрытые поля формы -->
+									<input type="hidden" name="salon" value="{{ selected_salon.id }}">
+									<input type="hidden" name="procedure" value="{{ selected_procedure.id }}">
+									<input type="hidden" name="specialist" value="{{ selected_specialist.id }}">
+
+									<div class="contacts__form_block fic">
+										<!-- Имя -->
+										<input type="text"
+											   name="customer_name"
+											   class="contacts__form_input"
+											   placeholder="Введите имя"
+											   value="{{ form.customer_name.value|default_if_none:'' }}"
+											   required>
+										<!-- Телефон -->
+										<div class="contacts__form_inputBlock">
+											<input type="text"
+												   name="phone"
+												   class="contacts__form_input"
+												   placeholder="+7(999)999-99-99"
+												   value="{{ form.phone.value|default_if_none:'' }}"
+												   required>
+										</div>
+									</div>
+
+									<!-- Комментарий -->
+									<textarea name="question" class="contacts__form_textarea" placeholder="Вопрос (необязательно)">{{ form.question.value|default_if_none:'' }}</textarea>
+
+									<!-- Согласие -->
+									<div class="contacts__form_checkboxBlock fic">
+										<input type="checkbox" id="privacyPolicy" class="contacts__form_checkbox" required>
+										<span class="contacts__form_checkboxBlock__intro">
+											Я согласен(а) с политикой обработки персональных данных
+										</span>
+									</div>
+
+									<!-- Кнопки -->
+									<button type="submit" class="serviceFinally__form_btn">Записаться и оплатить</button>
+									<a href="{% url 'service' %}" class="serviceFinally__form_back">Назад</a>
+								</div>
 							</form>
+						{% else %}
+							<div style="background: #fff3cd; color: #856404; padding: 20px; border-radius: 5px; margin: 20px 0;">
+								⚠️ Не все параметры выбраны.
+								<a href="{% url 'service' %}" style="display: block; margin-top: 10px;">Вернитесь к выбору услуги</a>
 							</div>
+						{% endif %}
 					</div>
 
-								{% endif %}
-							</div>
+					<div class="col-md-12 col-lg-5">
+						<!-- Боковая панель с информацией -->
+						<div class="info-sidebar">
+							<!-- Информация о салоне -->
+							{% if selected_salon %}
+								<div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+									<h4 style="margin-bottom: 15px;">📍 Адрес салона</h4>
+									<p>{{ selected_salon.address }}</p>
+									{% if selected_salon.phone %}
+										<p style="color: #28a745;">📞 {{ selected_salon.phone }}</p>
+									{% endif %}
+								</div>
+							{% endif %}
+
+							<!-- Важная информация -->
+							<div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+								<h4 style="margin-bottom: 15px;">💡 Что нужно знать</h4>
+								<ul style="padding-left: 20px;">
+									<li style="margin-bottom: 10px;">Приходите за 10 минут до записи</li>
+									<li style="margin-bottom: 10px;">Отмена за 24 часа - полный возврат</li>
+									<li>При опоздании более 15 минут запись может быть отменена</li>
 								</ul>
 							</div>
 
+							<!-- Контакты для вопросов -->
+							<div style="background: #e3f2fd; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+								<h4 style="margin-bottom: 15px;">❓ Вопросы?</h4>
+								<p>Звоните:</p>
+								{% if settings and settings.manager_phone %}
+									<a href="tel:{{ settings.manager_phone }}"
+									   style="display: inline-block; background: #17a2b8; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; margin: 10px 0;">
+										📞 {{ settings.manager_phone_pretty|default:settings.manager_phone }}
+									</a>
+								{% endif %}
 							</div>
+
+							<!-- Баннер -->
+							<img src="{% static 'img/bannerImg.svg' %}" alt="bannerImg" class="banner__img">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<footer id="footer">
+		<div class="container">
+			<div class="footer">
+				<div class="footer__block">
+					<div class="row">
+						<div class="col-md-3 col-lg-2">
+							<a href="/"><img src="{% static 'img/Logo.svg' %}" alt="logo" class="footer__logo"></a>
+						</div>
+						<div class="col-md-5 minMobHide">
+							<nav>
+								<ul class="menu">
+									<li class="menu__item"><a href="#" class="menu__item_link">Мастера</a></li>
+									<li class="menu__item"><a href="#" class="menu__item_link">Услуги</a></li>
+									<li class="menu__item"><a href="#" class="menu__item_link">Отзывы</a></li>
+									<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
+								</ul>
+							</nav>
+						</div>
+					</div>
+					<div class="footer__contact">
+						<div class="row">
+							<div class="col-md-4">
+								<div class="footer__data">с 10:00 до 20:00 без выходных</div>
+							</div>
+							<div class="col-md-3">
+								{% if settings and settings.manager_phone %}
+									<a href="tel:{{ settings.manager_phone }}" class="contacts__info_tel">{{ settings.manager_phone_pretty|default:settings.manager_phone }}</a>
+								{% endif %}
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-5 minMobShow">
+								<nav>
+									<ul class="menu">
+										<li class="menu__item"><a href="#" class="menu__item_link">Мастера</a></li>
+										<li class="menu__item"><a href="#" class="menu__item_link">Услуги</a></li>
+										<li class="menu__item"><a href="#" class="menu__item_link">Отзывы</a></li>
+										<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
+									</ul>
+								</nav>
+							</div>
+						</div>
+					</div>
+					<hr class="hr">
+					<div class="footer__bottom">
+						<div class="row">
+							<div class="col-md-4 col-lg-3">
+								<a href="#" class="footer__link">Политика конфиденциальности</a>
+							</div>
+							<div class="col-md-3">
+								<div class="footer__copy">2022. Все права защищены</div>
+							</div>
+							<div class="col-md-3 col-lg-2">
+								<div class="footer__social fic">
+									<a href=""><img src="{% static 'img/waGray.svg' %}" alt="wa" class="contacts__social_icon"></a>
+									<a href=""><img src="{% static 'img/vkGray.svg' %}" alt="vk" class="contacts__social_icon"></a>
+									<a href=""><img src="{% static 'img/tgGray.svg' %}" alt="tg" class="contacts__social_icon"></a>
+									<a href=""><img src="{% static 'img/instaGray.svg' %}" alt="insta" class="contacts__social_icon"></a>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+	</footer>
+
+	<!-- Модальные окна (если нужны) -->
+	<div style="display: none;">
+		<div class="box-modal authPopup popup" id="authModal">
+			<div class="box-modal_close arcticmodal-close"><img src="{% static 'img/x.svg' %}" alt="x"></div>
+			<div class="popup__title authPopup__title">Войти по коду</div>
+			<p class="popup__text authPopup__text">Введите свой номер телефона, мы вышлем на него код</p>
+			<form action="#" class="authPopup__form">
+				<div class="contacts__form_inputBlock">
+					<input type="text" name="tel" class="contacts__form_input" placeholder="+7(999)999-99-99" required>
+				</div>
+				<div class="contacts__form_checkboxBlock fic">
+					<input type="checkbox" class="contacts__form_checkbox" checked>
+					<span class="contacts__form_checkboxBlock__intro">Я согласен(а) с политикой конфиденциальности</span>
+				</div>
+				<button type="submit" class="popup__btn authPopup__btn">Отправить</button>
+			</form>
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js" integrity="sha512-XtmMtDEcNz2j7ekrtHvOVR4iwwaD6o/FUJe6+Zq+HgcCsk3kj4uSQQR8weQ2QVj1o0Pk6PwYLohm206ZzNfubg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="{% static 'js/jquery.arcticmodal-0.3.min.js' %}"></script>
+	<script src="{% static 'js/main.js' %}"></script>
 
 	<script>
-					}
-					}
-					}
-					}
+	// Глобальные переменные
+	let originalPrice = {{ selected_procedure.base_price|default:"0" }};
+	let finalPrice = originalPrice;
+	let promoCode = '';
 
+	// Функция проверки промокода
+	async function checkPromoFinal() {
+		const code = document.getElementById('promo-input-final').value.trim();
+		const resultDiv = document.getElementById('promo-result-final');
+		const finalPriceElement = document.getElementById('final-price');
 
-					e.preventDefault();
+		if (!code) {
+			// Сбрасываем промокод
+			promoCode = '';
+			finalPrice = originalPrice;
+			resultDiv.innerHTML = '';
+			finalPriceElement.textContent = `${originalPrice} ₽`;
+			return;
+		}
 
+		try {
+			const res = await fetch('/api/validate-promo/', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					promo_code: code,
+					procedure_id: {{ selected_procedure.id|default:"0" }}
+				})
+			});
+			const data = await res.json();
 
+			if (data.valid) {
+				promoCode = code;
+				finalPrice = parseFloat(data.new_price);
+				resultDiv.innerHTML = `
+					Скидка ${data.discount_percent}%.<br>
+				`;
+				finalPriceElement.textContent = `${data.new_price} ₽`;
+			} else {
+				promoCode = '';
+				finalPrice = originalPrice;
+				resultDiv.innerHTML = `<span style="color:red">${data.error}</span>`;
+				finalPriceElement.textContent = `${originalPrice} ₽`;
+			}
+		} catch (error) {
+			resultDiv.innerHTML = '<span style="color:red">Ошибка соединения</span>';
+			finalPriceElement.textContent = `${originalPrice} ₽`;
+		}
+	}
 
+	// Обработчик ввода промокода
+	document.getElementById('promo-input-final').addEventListener('input', function() {
+		clearTimeout(this.debounceTimer);
+		this.debounceTimer = setTimeout(checkPromoFinal, 500);
+	});
+
+	// Маска для телефона
+	$(document).ready(function() {
+		$('input[name="phone"]').on('input', function() {
+			let value = $(this).val().replace(/\D/g, '');
+			if (value.length > 0) {
+				if (value[0] !== '7' && value[0] !== '8') {
+					value = '7' + value;
+				}
+				let formatted = '+7';
+				if (value.length > 1) {
+					formatted += ' (' + value.substring(1, 4);
+				}
+				if (value.length > 4) {
+					formatted += ') ' + value.substring(4, 7);
+				}
+				if (value.length > 7) {
+					formatted += '-' + value.substring(7, 9);
+				}
+				if (value.length > 9) {
+					formatted += '-' + value.substring(9, 11);
+				}
+				$(this).val(formatted);
+			}
 		});
+
+		// Проверка формы
+		$('form').on('submit', function(e) {
+			const phone = $('input[name="phone"]').val();
+			const name = $('input[name="customer_name"]').val();
+			const privacy = $('#privacyPolicy').is(':checked');
+
+			if (!name || name.trim().length < 2) {
+				alert('Пожалуйста, введите ваше имя (минимум 2 символа)');
+				e.preventDefault();
+				return false;
+			}
+
+			if (!phone || !phone.match(/^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/)) {
+				alert('Пожалуйста, введите корректный номер телефона в формате +7 (999) 999-99-99');
+				e.preventDefault();
+				return false;
+			}
+
+			if (!privacy) {
+				alert('Пожалуйста, согласитесь с политикой конфиденциальности');
+				e.preventDefault();
+				return false;
+			}
+
+			// Добавляем промокод и финальную цену в форму
+			$('<input>').attr({
+				type: 'hidden',
+				name: 'promo_code_final',
+				value: promoCode
+			}).appendTo(this);
+
+			$('<input>').attr({
+				type: 'hidden',
+				name: 'final_price',
+				value: finalPrice
+			}).appendTo(this);
+
+			// Показать лоадер
+			$(this).find('button[type="submit"]')
+				.html('⏳ Обработка...')
+				.prop('disabled', true);
+		});
+	});
 	</script>
 </body>
 </html>
