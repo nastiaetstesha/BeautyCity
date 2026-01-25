@@ -138,7 +138,6 @@ def validate_promo(request):
             "error": "Процедура не найдена"
         })
 
-    # Проверяем промокод
     try:
         promo = PromoCode.objects.get(code__iexact=code, is_active=True)
     except PromoCode.DoesNotExist:
