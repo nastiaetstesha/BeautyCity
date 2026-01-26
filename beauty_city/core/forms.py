@@ -1,6 +1,8 @@
 from django import forms
-from django.core.validators import RegexValidator
-from .models import Booking, Salon, Procedure, Specialist
+from django.core.exceptions import ValidationError
+import re
+
+from .models import Booking
 
 
 class BookingForm(forms.ModelForm):
@@ -28,7 +30,6 @@ class BookingForm(forms.ModelForm):
             'question': 'Комментарий',
         }
 
-
     customer_name = forms.CharField(
         max_length=120,
         widget=forms.TextInput(attrs={
@@ -40,19 +41,12 @@ class BookingForm(forms.ModelForm):
 
     phone = forms.CharField(
         max_length=20,
-        validators=[
-            RegexValidator(
-                regex=r'^\+?7?\d{10,15}$',
-                message='Телефон должен быть в формате: +79998887766'
-            )
-        ],
         widget=forms.TextInput(attrs={
             'class': 'contacts__form_iunput',
             'placeholder': '+7 (999) 999-99-99',
             'required': True
         })
     )
-
 
     booking_date = forms.DateField(
         required=False,
@@ -65,16 +59,19 @@ class BookingForm(forms.ModelForm):
     )
 
     def clean_phone(self):
-        """Очистка и форматирование телефона"""
-        phone = self.cleaned_data.get('phone')
+        """Очистка и приведение телефона к формату +79998887766"""
+        phone = self.cleaned_data.get('phone', '').strip()
 
         phone = ''.join(c for c in phone if c.isdigit() or c == '+')
 
-
         if phone.startswith('8'):
             phone = '+7' + phone[1:]
-
+        elif phone.startswith('7'):
+            phone = '+7' + phone[1:]
         elif not phone.startswith('+7'):
-            phone = '+7' + phone.lstrip('7')
+            phone = '+7' + phone.lstrip('+7')
+
+        if not re.fullmatch(r'^\+7\d{10}$', phone):
+            raise ValidationError('Телефон должен быть в формате: +79998887766')
 
         return phone

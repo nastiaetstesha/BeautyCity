@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from datetime import datetime
+from datetime import datetime, timedelta
 from .models import Salon, Procedure, Specialist, SiteSettings, Booking, PromoCode
 from .slots import get_available_slots
 from .forms import BookingForm
@@ -37,7 +37,9 @@ def popup_examples(request):
 
 def service(request):
     """Страница записи на услугу"""
+
     salons = Salon.objects.filter(is_active=True)
+
     procedures = Procedure.objects.all()
     specialists = Specialist.objects.filter(is_active=True)
 
@@ -58,8 +60,28 @@ def service(request):
     selected_procedure = get_object_or_404(Procedure, pk=procedure_id) if procedure_id else None
     selected_specialist = get_object_or_404(Specialist, pk=specialist_id) if specialist_id else None
 
+    if selected_specialist:
+        procedures = procedures.filter(specialists=selected_specialist).distinct()
+        specialists = specialists.filter(pk=selected_specialist.pk)
+
+    elif selected_salon and selected_procedure:
+        specialists = specialists.filter(
+            salons__salon=selected_salon,
+            procedures=selected_procedure
+        ).distinct()
+
+    elif selected_salon and not selected_procedure:
+        specialists = specialists.filter(
+            salons__salon=selected_salon
+        ).distinct()
+
+    elif selected_procedure and not selected_salon:
+        specialists = specialists.filter(
+            procedures=selected_procedure
+        ).distinct()
+
     time_slots = None
-    if all([salon_id, procedure_id, specialist_id]):
+    if all([selected_salon, selected_procedure, selected_specialist]):
         time_slots = get_available_slots(
             salon=selected_salon,
             specialist=selected_specialist,
@@ -71,11 +93,13 @@ def service(request):
         "salons": salons,
         "procedures": procedures,
         "specialists": specialists,
+
         "selected_date": selected_date,
         "selected_salon": selected_salon,
         "selected_procedure": selected_procedure,
         "selected_specialist": selected_specialist,
         "time_slots": time_slots,
+
         "selected_salon_id": salon_id,
         "selected_procedure_id": procedure_id,
         "selected_specialist_id": specialist_id,
@@ -120,7 +144,7 @@ def service_finally(request):
             # Устанавливаем дату и время
             start_at = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
             booking.start_at = timezone.make_aware(start_at)
-            booking.end_at = booking.start_at + timezone.timedelta(
+            booking.end_at = booking.start_at + timedelta(
                 minutes=procedure.duration_minutes
             )
 
@@ -132,8 +156,10 @@ def service_finally(request):
 
             # Перенаправляем на оплату
             return redirect('create_payment', booking_id=booking.id)
+        else:
+            print("FORM ERRORS:", form.errors)
     else:
-        # GET запрос - создаем предзаполненную форму
+            # GET запрос - создаем предзаполненную форму
         initial_data = {
             'salon': salon_id,
             'procedure': procedure_id,
@@ -152,7 +178,6 @@ def service_finally(request):
         'selected_date': date_str,
         'selected_time': time_str,
     })
-
 
 @csrf_exempt
 @require_POST

@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-
+from yookassa import Configuration
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -14,13 +14,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&t0t#$%sqqe01hd*)^n_@4iqxv=z^oxpv=292oyeau6=t#_)62'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 YOOKASSA_SHOP_ID = os.getenv('YOOKASSA_SHOP_ID')
 YOOKASSA_SECRET_KEY = os.getenv('YOOKASSA_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 YOOKASSA_TEST_MODE = True
 DEBUG = True
 
+if YOOKASSA_SHOP_ID and YOOKASSA_SECRET_KEY:
+    Configuration.configure(
+        YOOKASSA_SHOP_ID,
+        YOOKASSA_SECRET_KEY,
+    )
+else:
+    print("YooKassa: нет ключей!", YOOKASSA_SHOP_ID, YOOKASSA_SECRET_KEY)
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
